@@ -8,4 +8,7 @@ export class AppService {
   getArticles(): string{
     return 'articles';
   }
+  getItemById( id:string ): string{
+      return id;
+  }
 }
