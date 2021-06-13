@@ -8,12 +8,16 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     constructor( private authService: AuthService ){
         super();
     }
-
+// code : string
     async validate( username: string, password: string ): Promise<any> {
-        const user = await this.authService.validateUser( username, password );
-        if( !user ){
+        console.log( 'local.startegy.ts ::: validate() exec' );
+        const admin = await this.authService.validateUser( username, password );
+        //const admin = await this.authService.validateUser( code );
+        console.log( 'local.startegy.ts ::: validateUser() => return user' );
+        console.log( 'user => ', admin );
+        if( !admin  ){
             throw new UnauthorizedException();
         }
-        return user;
+        return admin;
     }
 }
