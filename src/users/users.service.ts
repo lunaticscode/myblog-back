@@ -1,37 +1,40 @@
 import { Injectable } from '@nestjs/common';
-
-export type User = any;
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm'
+import { User } from './users.entity';
+import { MyauthService } from '../myauth/myauth.service';
 
 @Injectable()
 export class UsersService {
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+        private myAuthService : MyauthService,        
+        ) {}
+         
+    async getAllUsers(): Promise<User[]>{
+        return await this.userRepository.find()
+    } 
 
-    private readonly users = [
-        {
-            userId: 1,
-            username: 'john',
-            password: '1234',
-        },
-        {
-            userId: 2,
-            username: 'maria',
-            password: '12345',
-        },
-    ];
-    private readonly admin = [
-        {
-          code : 'humanwater1234',
-        },
-    ];
-    
-    async findOne( username: string ): Promise<User | undefined> {
-        // find() : 해당 조건에 맞는 배열 원소 반환
-        console.log( 'users.service.ts ::: findOne() - find(유저네임 같은거) exec' );
-        return this.users.find(user => user.username === username);
+    async createDummy(): Promise<void> {
+        const result = await this.userRepository.save({id: 'hw-admin1', password:'test1234'})
+        console.log(result);
     }
-    // async findOne( code: string ): Promise<User | undefined> {
-    //     // find() : 해당 조건에 맞는 배열 원소 반환
-    //     console.log( 'users.service.ts ::: findOne() - find exec' );
-    //     return this.admin.find( admin => admin.code === code);
-    // }
+
+    async createAdmin(info): Promise<boolean> {
+        const result = await this.userRepository.save(info);
+        console.log(result);
+        return true;
+    }
+
+    async findAdmin( id: string, pw: string ): Promise<User | undefined >{
+        console.log( 'findAdmin() ::: id => ', id );
+        const findResult = await this.userRepository.findOne({ id: id });
+        if( findResult ){
+            const valideResult = await this.myAuthService.validateAdminPassword( pw, findResult.password );
+            console.log(valideResult);
+        }
+        return findResult; 
+    }
     
 }
