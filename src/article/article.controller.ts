@@ -10,8 +10,9 @@ export class ArticleController {
     ) {}
 
     @Get('/list')
-    async getAllArticle( @Res() res: Response ){
+    async getAllArticle( @Req() req: Request, @Res() res: Response ){
         const result = await this.articleService.getAllArticle();
+        
         res.status(HttpStatus.OK).json( { res: 20000, list: result } )
     }
     

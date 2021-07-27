@@ -5,18 +5,21 @@ export class Article {
     @PrimaryGeneratedColumn()
     no: number;
     
-    @Column( "char", { length: 30, })
+    @Column( "char", { length: 20 } )
+    id: string;
+
+    @Column( "char", { length: 30, } )
     title: string;
 
-    @Column("text")
+    @Column( "text" )
     content: string;
     
     @Column()
     tags: string;
 
-    @Column("timestamp")
+    @Column( "timestamp" )
     uploaded: Date;
 
-    @Column("timestamp")
+    @Column( "timestamp" )
     updated: Date;
 }

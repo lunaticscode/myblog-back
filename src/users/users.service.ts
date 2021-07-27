@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm'
+import { AdvancedConsoleLogger, Repository } from 'typeorm'
 import { User } from './users.entity';
 import { MyauthService } from '../myauth/myauth.service';
+import { API_RESULT } from '../_common'; 
 
 @Injectable()
 export class UsersService {
@@ -27,14 +28,25 @@ export class UsersService {
         return true;
     }
 
-    async findAdmin( id: string, pw: string ): Promise<User | undefined >{
+    async loginAdmin( id: string, pw: string ): Promise<User | object >{
         console.log( 'findAdmin() ::: id => ', id );
         const findResult = await this.userRepository.findOne({ id: id });
+        console.log('findResult => ', findResult);
         if( findResult ){
             const valideResult = await this.myAuthService.validateAdminPassword( pw, findResult.password );
-            console.log(valideResult);
+            if( !valideResult['result'] ){
+                switch( valideResult['type'] ){
+                    case 'password':
+                        return { res: API_RESULT.FAIL, msg: "invalid password" }
+                    case 'token':
+                        return { res: API_RESULT.FAIL, msg: "invalid token" }        
+                    default:
+                        return { res: API_RESULT.FAIL, msg: "error" }
+                }      
+            }
+            return { res: API_RESULT.SUCCESS, token: valideResult['token'] };
         }
-        return findResult; 
+        return { res: API_RESULT.FAIL }; 
     }
     
 }
